@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de Publicación</title>
+    <link rel="stylesheet" href="{% static 'publications_network/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Detalle de la Publicación #{{ post.id }}</h1>
+        
+        <div class="form-section">
+            <p><strong>Tipo de publicación:</strong> {{ post.get_post_type_display }}</p>
+            <p><strong>Texto / Caption:</strong> {{ post.caption|default:"Sin texto" }}</p>
+            <p><strong>Archivo adjunto:</strong> {{ post.file.name }}</p>
+            <p><strong>Fecha de creación:</strong> {{ post.created_at|date:"Y-m-d H:i" }}</p>
+        </div>
+
+        <h2>Redes Sociales / Tareas Programadas</h2>
+        {% if post.tasks.all %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Tarea</th>
+                        <th>Red Social</th>
+                        <th>Usuario</th>
+                        <th>Fecha Programada</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in post.tasks.all %}
+                        <tr>
+                            <td>{{ task.id }}</td>
+                            <td>{{ task.account.get_platform_display }}</td>
+                            <td>@{{ task.account.account_user }}</td>
+                            <td>{{ task.scheduled_at|date:"Y-m-d H:i" }}</td>
+                            <td><strong>{{ task.get_status_display }}</strong></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No se ha programado en ninguna red social aún.</p>
+        {% endif %}
+
+        <hr>
+        <a href="{% url 'index' %}" class="btn btn-secondary">← Volver al Historial</a>
+    </div>
+</body>
+</html>

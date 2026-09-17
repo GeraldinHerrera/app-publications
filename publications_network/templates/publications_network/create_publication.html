@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Tarea de Publicación </title>
+    <link rel="stylesheet" href="{% static 'publications_network/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h2> Programar Publicaciones</h2>
+        <form method="POST" action="{% url 'create_publication' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!--  SELECCIONAR O CREAR CUENTA DE RED SOCIAL -->
+            <div class="form-section">
+                <h3>Cuenta de Red Social</h3>
+                
+                {% if accounts %}
+                    <div class="radio-option">
+                        <input type="radio" id="account_mode_existing" name="account_mode" value="existing" checked onclick="toggleAccountMode()">
+                        <label for="account_mode_existing" style="display:inline;">Seleccionar una cuenta existente:</label>
+                        <br><br>
+                        <select name="existing_account_id" id="existing_account_id">
+                            {% for acc in accounts %}
+                                <option value="{{ acc.id }}">{{ acc.get_platform_display }} — Usuario: @{{ acc.account_user }} (ID: {{ acc.id }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <hr>
+                {% endif %}
+
+                <div class="radio-option">
+                    <input type="radio" id="account_mode_new" name="account_mode" value="new" {% if not accounts %}checked{% endif %} onclick="toggleAccountMode()">
+                    <label for="account_mode_new" style="display:inline;">Registrar una nueva cuenta social:</label>
+                </div>
+
+                <div id="new_account_fields" class="{% if accounts %}hidden-field{% endif %}" style="margin-left: 20px;">
+                    <div class="form-group">
+                        <label for="new_platform">Plataforma:</label>
+                        <select name="new_platform" id="new_platform">
+                            <option value="instagram">Instagram</option>
+                            <option value="tiktok">TikTok</option>
+                            <option value="facebook">Facebook</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new_account_user">Usuario (Ej: @mi_marca):</label>
+                        <input type="text" name="new_account_user" id="new_account_user" placeholder="ej: mi_empresa">
+                    </div>
+                    <div class="form-group">
+                        <label for="new_account_password">Contraseña</label>
+                        <input type="password" name="new_account_password" id="new_account_password" value="password123">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SELECCIONAR O CREAR CONTENIDO DE LA PUBLICACIÓN -->
+            <div class="form-section">
+                <h3>Contenido de la Publicación</h2>
+
+                {% if posts %}
+                    <div class="radio-option">
+                        <input type="radio" id="post_mode_existing" name="post_mode" value="existing" checked onclick="togglePostMode()">
+                        <label for="post_mode_existing" style="display:inline;">Seleccionar una publicación existente:</label>
+                        <br><br>
+                        <select name="existing_post_id" id="existing_post_id">
+                            {% for post in posts %}
+                                <option value="{{ post.id }}">[{{ post.get_post_type_display }} #{{ post.id }}] {{ post.caption|default:"Sin caption"|truncatewords:8 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <hr>
+                {% endif %}
+
+                <div class="radio-option">
+                    <input type="radio" id="post_mode_new" name="post_mode" value="new" {% if not posts %}checked{% endif %} onclick="togglePostMode()">
+                    <label for="post_mode_new" style="display:inline;">Crear una nueva publicación:</label>
+                </div>
+
+                <div id="new_post_fields" class="{% if posts %}hidden-field{% endif %}" style="margin-left: 20px;">
+                    <div class="form-group">
+                        <label for="new_post_type">Tipo de Publicación:</label>
+                        <select name="new_post_type" id="new_post_type">
+                            <option value="post">Post / Feed</option>
+                            <option value="reel">Reel / Short</option>
+                            <option value="story">Historia</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new_caption">Caption / Texto o Hashtags:</label>
+                        <textarea name="new_caption" id="new_caption" rows="3" placeholder="Escribe el texto de tu publicación aquí..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="new_file">Archivo Adjunto (Imagen/Video):</label>
+                        <input type="file" name="new_file" id="new_file">
+                    </div>
+                </div>
+            </div>
+
+            <!-- DETALLES DE LA TAREA -->
+            <div class="form-section">
+                <h3>Programación, Estado y Alerta (PostTask)</h3>
+                <div class="form-group">
+                    <label for="scheduled_at">Fecha y Hora Programada:</label>
+                    <input type="datetime-local" name="scheduled_at" id="scheduled_at" value="{{ now_str }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="status">Estado de la Tarea:</label>
+                    <select name="status" id="status">
+                        <option value="completed" selected>Publicado</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="processing">En proceso</option>
+                        <option value="failed">Error</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="recipient_email">Enviar Notificación por Correo a:</label>
+                    <input type="email" name="recipient_email" id="recipient_email" value="hgeraldin35@gmail.com" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary"> Guardar Tarea</button>
+        </form>
+
+        <hr>
+        <a href="{% url 'index' %}" class="btn btn-secondary">Volver al Historial</a>
+    </div>
+
+    <script>
+        function toggleAccountMode() {
+            var isNew = document.getElementById('account_mode_new').checked;
+            document.getElementById('new_account_fields').style.display = isNew ? 'block' : 'none';
+        }
+        function togglePostMode() {
+            var isNew = document.getElementById('post_mode_new').checked;
+            document.getElementById('new_post_fields').style.display = isNew ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>

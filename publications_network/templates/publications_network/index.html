@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Publicaciones</title>
+    <link rel="stylesheet" href="{% static 'publications_network/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h2>Historial de Publicaciones</h2>
+
+        {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-warning{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <p>
+            <a href="{% url 'create_publication' %}" class="btn btn-primary">
+                 Crear Publicación
+            </a>
+        </p>
+
+        {% if history %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Tarea</th>
+                        <th>Tipo</th>
+                        <th>Red Social</th>
+                        <th>Usuario</th>
+                        <th>Caption / Texto</th>
+                        <th>Fecha Programada</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in history %}
+                        <tr>
+                            <td>{{ task.id }}</td>
+                            <td>{{ task.post_content.get_post_type_display }}</td>
+                            <td>{{ task.account.get_platform_display }}</td>
+                            <td>@{{ task.account.account_user }}</td>
+                            <td>{{ task.post_content.caption|default:"-"|truncatewords:10 }}</td>
+                            <td>{{ task.scheduled_at|date:"Y-m-d H:i" }}</td>
+                            <td><strong>{{ task.get_status_display }}</strong></td>
+                            <td>
+                                <a href="{% url 'post_detail' task.post_content.id %}" class="btn btn-secondary btn-sm">
+                                    Ver detalle
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No hay historial de publicaciones registrado aún.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
