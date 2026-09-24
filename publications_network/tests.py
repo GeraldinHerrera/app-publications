@@ -61,3 +61,18 @@ class PublicationsHistoryViewsTest(TestCase):
         self.assertIsNotNone(task)
         self.assertEqual(task.status, 'completed')
         self.assertTrue(mock_send_alert.called)
+
+    @patch('publications_network.views.generate_ai_response')
+    def test_ai_assistant_view(self, mock_generate_ai):
+        mock_generate_ai.return_value = 'Respuesta simulada de la IA Gemini'
+
+        # Test GET
+        response_get = self.client.get(reverse('ai_assistant'))
+        self.assertEqual(response_get.status_code, 200)
+        self.assertContains(response_get, 'Asistente de IA')
+
+        # Test POST
+        response_post = self.client.post(reverse('ai_assistant'), {'prompt': '¿Cuáles son las tendencias?'})
+        self.assertEqual(response_post.status_code, 200)
+        self.assertContains(response_post, 'Respuesta simulada de la IA Gemini')
+        self.assertTrue(mock_generate_ai.called)

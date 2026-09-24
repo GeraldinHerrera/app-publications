@@ -1,6 +1,7 @@
 import os
 import requests
 API_ALERTS_URL = os.getenv("API_ALERTS_URL", "http://localhost:8001/api/notifications/")
+# API_ALERTS_URL = os.getenv("API_ALERTS_URL", "https://api-publicationalerts-production-c1cf.up.railway.app/api/notifications/")
 
 def send_alert_notification(post_task_id: int, event_type: str, channel_type: str, recipient: str, message: str) -> bool:
 

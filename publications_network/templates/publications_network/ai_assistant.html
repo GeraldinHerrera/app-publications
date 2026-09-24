@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Asistente de IA — Publications </title>
+    <link rel="stylesheet" href="{% static 'publications_network/css/style.css' %}">
+    <style>
+        .suggestion-btn {
+            background: #e9ecef;
+            border: 1px solid #ced4da;
+            padding: 6px 12px;
+            margin: 4px 4px 4px 0;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .suggestion-btn:hover {
+            background: #dee2e6;
+        }
+        .ai-response-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Asistente de IA (Google Gemini)</h1>
+        <p>Pregunta sobre **tendencias en redes sociales** (Instagram, TikTok, Facebook) o realiza **consultas analíticas sobre los datos reales** de tu proyecto.</p>
+
+        <form method="POST" action="{% url 'ai_assistant' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="prompt">Escribe tu pregunta para la IA:</label>
+                <textarea name="prompt" id="prompt" rows="4" placeholder="Ej: ¿Qué tipo de reels son tendencia en Instagram esta semana? o ¿Cuántos posts de tipo reel tenemos guardados?" required>{{ user_prompt }}</textarea>
+            </div>
+
+            <div>
+                <strong>Sugerencias rápidas:</strong><br>
+                <button type="button" class="suggestion-btn" onclick="setPrompt('¿Cuáles son los tipos de reels o videos que están en auge en Instagram este mes?')"> Reels en auge en Instagram</button>
+                <button type="button" class="suggestion-btn" onclick="setPrompt('¿Cuántas publicaciones y tareas tenemos registradas en la base de datos?')">Resumen de mis publicaciones</button>
+                <button type="button" class="suggestion-btn" onclick="setPrompt('Dame 5 sugerencias de captions y hashtags para promocionar un producto tecnológico en TikTok.')">Ideas de Captions y Hashtags</button>
+            </div>
+
+            <br>
+            <button type="submit" class="btn btn-primary">✨ Consultar a la IA</button>
+        </form>
+
+        {% if ai_response %}
+            <div class="ai-response-box">
+                <h3>💬 Respuesta del Asistente de IA:</h3>
+                <div>{{ ai_response }}</div>
+            </div>
+        {% endif %}
+
+        <hr>
+        <a href="{% url 'index' %}" class="btn btn-secondary">← Volver al Historial</a>
+    </div>
+
+    <script>
+        function setPrompt(text) {
+            document.getElementById('prompt').value = text;
+        }
+    </script>
+</body>
+</html>
