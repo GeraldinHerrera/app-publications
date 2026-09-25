@@ -6,10 +6,6 @@ from .services import send_alert_notification
 from .ai_assistant import generate_ai_response
 
 def index(request):
-    """
-    Vista de Historial: realiza JOIN entre PostTask, PostContent y SocialAccount
-    usando select_related para traer todas las publicaciones agendadas/ejecutadas.
-    """
     history = PostTask.objects.select_related('post_content', 'account').order_by('-scheduled_at')
     return render(request, 'publications_network/index.html', {'history': history})
 
@@ -23,10 +19,7 @@ def post_detail(request, post_id):
     return render(request, 'publications_network/post_detail.html', {'post': post})
 
 def create_publication(request):
-    """
-    Formulario para relacionar un PostContent y una SocialAccount dentro de una PostTask,
-    o crear nuevos registros sobre la marcha, y notificar al microservicio en Railway.
-    """
+  
     if request.method == 'POST':
         account_mode = request.POST.get('account_mode', 'new')
         post_mode = request.POST.get('post_mode', 'new')
@@ -76,7 +69,7 @@ def create_publication(request):
 
         task_status = request.POST.get('status', 'completed')
 
-        # Se crea la tarea PostTask relacionando PostContent y SocialAccount
+
         task = PostTask.objects.create(
             post_content=post,
             account=account,
@@ -84,7 +77,6 @@ def create_publication(request):
             status=task_status
         )
 
-        # Notificar al microservicio externo
         recipient_email = request.POST.get('recipient_email', 'hgeraldin35@gmail.com')
         message_body = (
             f"¡Hola! Se ha registrado la tarea #{task.id} (Estado: {task.get_status_display()}) "
@@ -119,10 +111,7 @@ def create_publication(request):
     })
 
 def ai_assistant_view(request):
-    """
-    Vista del Asistente de IA: procesa la consulta del usuario mediante Google Gemini API
-    y devuelve la respuesta junto con el contexto del proyecto.
-    """
+
     ai_response = None
     user_prompt = ""
 
