@@ -1,0 +1,282 @@
+[
+{
+    "model": "publications_network.socialaccount",
+    "pk": 1,
+    "fields": {
+        "platform": "facebook",
+        "account_user": "hgeraldin35@gmail.com",
+        "account_password": "Bogota.2026*"
+    }
+},
+{
+    "model": "publications_network.postcontent",
+    "pk": 4,
+    "fields": {
+        "file": "publications_media/WhatsApp_Image_2026-07-09_at_12_EPzzBWQ.27.02_PM.jpeg",
+        "caption": "Esta es la descripción",
+        "post_type": "story",
+        "created_at": "2026-09-18T19:01:24.653Z"
+    }
+},
+{
+    "model": "publications_network.postcontent",
+    "pk": 5,
+    "fields": {
+        "file": "publications_media/WhatsApp_Video_2026-07-09_at_12.27.01_PM.mp4",
+        "caption": "Publicacion #2",
+        "post_type": "reel",
+        "created_at": "2026-09-26T14:11:59.990Z"
+    }
+},
+{
+    "model": "publications_network.posttask",
+    "pk": 8,
+    "fields": {
+        "post_content": 4,
+        "account": 1,
+        "scheduled_at": "2026-09-18T19:01:00Z",
+        "status": "pending"
+    }
+},
+{
+    "model": "publications_network.posttask",
+    "pk": 9,
+    "fields": {
+        "post_content": 4,
+        "account": 1,
+        "scheduled_at": "2026-09-26T14:43:00Z",
+        "status": "pending"
+    }
+},
+{
+    "model": "auth.user",
+    "fields": {
+        "password": "pbkdf2_sha256$1500000$8IRoHOEfo6WH4M9HtlPeN3$bGIC3L1FLjknzCH65R4ijwE1UcafmfbMFVqY6Uy+QZ8=",
+        "last_login": "2026-09-17T00:30:49.511Z",
+        "is_superuser": true,
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "email": "hgeraldin35@gmail.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2026-09-12T02:23:23.790Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "jruhx1vl30fs6rhzjap0frqw8rqxwfoi",
+    "fields": {
+        "session_data": ".eJxVjEEOwiAQRe_C2hAKDExduvcMZAaoVA0kpV0Z765NutDtf-_9lwi0rSVsPS9hTuIsBnH63ZjiI9cdpDvVW5Ox1XWZWe6KPGiX15by83K4fweFevnWHhRG0BaQMytCylkBRe092yFNkZG1GT1a49RoGNBqcuCMBYOTVkq8P9XtNt4:1x701X:zdfw5ZrtH7W6hPCOOnEeejCQvJYmkx1Flt7OKKziYcc",
+        "expire_date": "2026-10-01T00:30:47.264Z"
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "o0w5k8256jhlj123dql4slfgeuy5n6ka",
+    "fields": {
+        "session_data": ".eJxVjEEOwiAQRe_C2hAKDExduvcMZAaoVA0kpV0Z765NutDtf-_9lwi0rSVsPS9hTuIsBnH63ZjiI9cdpDvVW5Ox1XWZWe6KPGiX15by83K4fweFevnWHhRG0BaQMytCylkBRe092yFNkZG1GT1a49RoGNBqcuCMBYOTVkq8P9XtNt4:1x5NAG:3y1baRAW6XDBXHvKBW5NHi_eXAokZyWo70v3noQaYvg",
+        "expire_date": "2026-09-26T12:49:04.075Z"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 1,
+    "fields": {
+        "action_time": "2026-09-12T02:24:54.057Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "publications_network",
+            "socialaccount"
+        ],
+        "object_id": "1",
+        "object_repr": "Facebook - hgeraldin35@gmail.com",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 2,
+    "fields": {
+        "action_time": "2026-09-12T02:26:43.979Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "publications_network",
+            "postcontent"
+        ],
+        "object_id": "1",
+        "object_repr": "post - 1",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 3,
+    "fields": {
+        "action_time": "2026-09-12T02:29:15.699Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "publications_network",
+            "posttask"
+        ],
+        "object_id": "1",
+        "object_repr": "facebook (pending) - 2026-09-12 18:00:00+00:00",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 4,
+    "fields": {
+        "action_time": "2026-09-18T18:59:52.091Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "publications_network",
+            "socialaccount"
+        ],
+        "object_id": "2",
+        "object_repr": "Instagram - test_user_final",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 5,
+    "fields": {
+        "action_time": "2026-09-18T19:00:03.549Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "publications_network",
+            "posttask"
+        ],
+        "object_id": "7",
+        "object_repr": "facebook (completed) - 2026-09-18 18:57:00+00:00",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 6,
+    "fields": {
+        "action_time": "2026-09-18T19:00:07.856Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "publications_network",
+            "posttask"
+        ],
+        "object_id": "6",
+        "object_repr": "facebook (pending) - 2026-09-10 22:58:00+00:00",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 7,
+    "fields": {
+        "action_time": "2026-09-18T19:00:12.811Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "publications_network",
+            "posttask"
+        ],
+        "object_id": "2",
+        "object_repr": "facebook (completed) - 2026-09-16 20:42:00+00:00",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 8,
+    "fields": {
+        "action_time": "2026-09-18T19:00:16.451Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "publications_network",
+            "posttask"
+        ],
+        "object_id": "1",
+        "object_repr": "facebook (pending) - 2026-09-12 18:00:00+00:00",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 9,
+    "fields": {
+        "action_time": "2026-09-18T19:00:24.313Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "publications_network",
+            "postcontent"
+        ],
+        "object_id": "3",
+        "object_repr": "reel - 3",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 10,
+    "fields": {
+        "action_time": "2026-09-18T19:00:29.052Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "publications_network",
+            "postcontent"
+        ],
+        "object_id": "2",
+        "object_repr": "reel - 2",
+        "action_flag": 3,
+        "change_message": ""
+    }
+},
+{
+    "model": "admin.logentry",
+    "pk": 11,
+    "fields": {
+        "action_time": "2026-09-18T19:01:24.655Z",
+        "user": [
+            "admin"
+        ],
+        "content_type": [
+            "publications_network",
+            "postcontent"
+        ],
+        "object_id": "4",
+        "object_repr": "post - 4",
+        "action_flag": 1,
+        "change_message": "[{\"added\": {}}]"
+    }
+}
+]

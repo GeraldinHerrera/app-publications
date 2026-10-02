@@ -5,27 +5,43 @@
     <meta charset="UTF-8">
     <title>Historial de Publicaciones</title>
     <link rel="stylesheet" href="{% static 'publications_network/css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="container">
         <h2>Historial de Publicaciones</h2>
 
         {% if messages %}
-            <div>
+            <div id="djangoIndexMessages" style="display:none;">
                 {% for message in messages %}
-                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-warning{% endif %}">
-                        {{ message }}
-                    </div>
+                    <span class="index-msg" data-tags="{{ message.tags }}" data-text="{{ message }}"></span>
                 {% endfor %}
             </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    var msgs = document.querySelectorAll("#djangoIndexMessages .index-msg");
+                    msgs.forEach(function(el) {
+                        var isSuccess = el.getAttribute("data-tags") === "success";
+                        Swal.fire({
+                            icon: isSuccess ? 'success' : 'warning',
+                            title: isSuccess ? '¡Éxito!' : 'Notificación',
+                            text: el.getAttribute("data-text") || "",
+                            confirmButtonColor: '#007bff'
+                        });
+                    });
+                });
+            </script>
         {% endif %}
 
         <p>
             <a href="{% url 'create_publication' %}" class="btn btn-primary">
-                ➕ Crear Publicación
+                Crear Publicación
+            </a>
+            <a href="{% url 'create_post' %}" class="btn btn-primary">
+                Crear Post
             </a>
             <a href="{% url 'ai_assistant' %}" class="btn btn-secondary" style="margin-left: 10px;">
-                🤖 Asistente de IA (Gemini)
+                Asistente de IA (Gemini)
             </a>
         </p>
 
@@ -34,6 +50,7 @@
                 <thead>
                     <tr>
                         <th>ID Tarea</th>
+                        <th>Vista Previa</th>
                         <th>Tipo</th>
                         <th>Red Social</th>
                         <th>Usuario</th>
@@ -47,6 +64,15 @@
                     {% for task in history %}
                         <tr>
                             <td>{{ task.id }}</td>
+                            <td>
+                                {% if task.post_content.is_video %}
+                                    <video src="{{ task.post_content.media_url }}" controls style="max-width: 110px; max-height: 80px; border-radius: 6px; border: 1px solid #ccc;"></video>
+                                {% elif task.post_content.is_image %}
+                                    <img src="{{ task.post_content.media_url }}" alt="Media Post" onerror="this.onerror=null; this.src='/media/publications_media/sample.png';" style="max-width: 110px; max-height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc;">
+                                {% else %}
+                                    <a href="{{ task.post_content.media_url }}" target="_blank">📄 Archivo</a>
+                                {% endif %}
+                            </td>
                             <td>{{ task.post_content.get_post_type_display }}</td>
                             <td>{{ task.account.get_platform_display }}</td>
                             <td>@{{ task.account.account_user }}</td>
@@ -54,6 +80,9 @@
                             <td>{{ task.scheduled_at|date:"Y-m-d H:i" }}</td>
                             <td><strong>{{ task.get_status_display }}</strong></td>
                             <td>
+                                <a href="{% url 'edit_post' task.post_content.id %}" class="btn btn-warning btn-sm" style="background-color: #ffc107; color: #212529; text-decoration: none; padding: 4px 10px; border-radius: 4px; display: inline-block; margin-right: 5px;">
+                                    Editar
+                                </a>
                                 <a href="{% url 'post_detail' task.post_content.id %}" class="btn btn-secondary btn-sm">
                                     Ver detalle
                                 </a>

@@ -1,0 +1,329 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Posts & Microservicios</title>
+    <link rel="stylesheet" href="{% static 'publications_network/css/style.css' %}">
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .ms-panel {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 25px;
+        }
+        .badge-status {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 0.9em;
+        }
+        .bg-java { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .bg-dotnet { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .bg-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .swagger-btn {
+            background-color: #6c757d;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.85em;
+            margin-right: 6px;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+        .swagger-btn:hover { background-color: #5a6268; color: white; }
+        .query-btn-group {
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        .btn-query {
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: 600;
+            text-decoration: none;
+            margin-right: 8px;
+            display: inline-block;
+        }
+        .btn-query-active {
+            box-shadow: 0 0 0 3px rgba(0,123,255,.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Crear y Gestionar Posts</h2>
+
+        <!-- Panel de Control e Integración de Microservicios -->
+        <div class="ms-panel">
+            <h3>Arquitectura de Microservicios</h3>
+            
+            <p><strong>Estado:</strong>
+                {% if cb_success %}
+                    <span class="badge-status {% if 'java' in circuit_breaker_fuente %}bg-java{% else %}bg-dotnet{% endif %}">
+                        {% if 'java' in circuit_breaker_fuente %}
+                            Operativo - Atendido por Servicio Primario (Java Spring Boot)
+                        {% else %}
+                            Fallback Activo - Atendido por Servicio Secundario (C# .NET 8)
+                        {% endif %}
+                    </span>
+                {% else %}
+                    <span class="badge-status bg-error">Servicio Degradado / Fuera de Línea</span>
+                {% endif %}
+            </p>
+
+            <div style="margin-top: 12px;">
+                <strong>Documentación Swagger:</strong><br>
+                <a href="http://localhost:3000/api-docs" target="_blank" class="swagger-btn">Swagger Node.js</a>
+                <a href="http://localhost:8080/swagger-ui.html" target="_blank" class="swagger-btn">Swagger Java Spring Boot</a>
+                <a href="http://localhost:5000/swagger" target="_blank" class="swagger-btn">Swagger C#</a>
+            </div>
+
+            <div class="query-btn-group">
+                <strong>Consultar Microservicios:</strong><br>
+                <a href="?source=node" onclick="showLoadingModal('Consultando Orquestador (Node.js)...', 'Realizando petición ');" class="btn btn-primary btn-query {% if selected_source == 'node' %}btn-query-active{% endif %}" style="background-color: #007bff;">
+                    Consultar por Orquestador (Node)
+                </a>
+                <a href="?source=java" onclick="showLoadingModal('Consultando Servicio Java...', 'Conectando directamente a Java');" class="btn btn-primary btn-query {% if selected_source == 'java' %}btn-query-active{% endif %}" style="background-color: #28a745;">
+                    Consultar por Java
+                </a>
+                <a href="?source=dotnet" onclick="showLoadingModal('Consultando Servicio C# .NET...', 'Conectando directamente a C# .NET ');" class="btn btn-primary btn-query {% if selected_source == 'dotnet' %}btn-query-active{% endif %}" style="background-color: #6f42c1;">
+                    Consultar por C#
+                </a>
+            </div>
+        </div>
+
+        <form id="createPostForm" method="POST" action="{% url 'create_post' %}?source={{ selected_source }}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-section">
+                <h3>Detalles de la Publicación</h3>
+
+                <div class="form-group">
+                    <label for="post_type">Tipo de Publicación:</label>
+                    <select name="post_type" id="post_type">
+                        {% for code, label in post_types %}
+                            <option value="{{ code }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="caption">Caption / Texto o Hashtags:</label>
+                    <textarea name="caption" id="caption" rows="3" placeholder="Escribe el texto de tu publicación aquí..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="file">Archivo Adjunto (Imagen / Video):</label>
+                    <input type="file" name="file" id="file">
+                </div>
+            </div>
+
+            <button type="submit" name="action" value="create_django" onclick="submitFormWithLoading('create_django');" class="btn btn-secondary">
+                Guardar Localmente 
+            </button>
+            <button type="submit" name="action" value="create_microservice" onclick="submitFormWithLoading('create_microservice');" class="btn btn-primary" style="margin-left: 10px; background-color: #28a745; border-color: #28a745;">
+                Guardar Vía Orquestador
+            </button>
+        </form>
+
+        <hr style="margin-top: 30px; margin-bottom: 25px;">
+
+        <h3>Historial Consultado desde: <span style="color: #3f6996e1;">{{ active_source_title }}</span></h3>
+
+        {% if ms_success %}
+            {% if microservices_posts %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Vista Previa / Contenido</th>
+                            <th>Tipo</th>
+                            <th>Caption / Texto</th>
+                            <th>Fecha de Registro</th>
+                            <th>Acciones Vía Orquestador</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in microservices_posts %}
+                            <tr>
+                                <td><strong>#{{ p.id }}</strong></td>
+                                <td>
+                                    {% if p.is_video %}
+                                        <video src="{{ p.media_url }}" controls style="max-width: 130px; max-height: 95px; border-radius: 6px; border: 1px solid #ccc;"></video>
+                                    {% elif p.is_image %}
+                                        <img src="{{ p.media_url }}" alt="Media Post" onerror="this.onerror=null; this.src='/media/publications_media/sample.png';" style="max-width: 130px; max-height: 95px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc;">
+                                    {% else %}
+                                        <a href="{{ p.media_url }}" target="_blank">📄 Archivo</a>
+                                    {% endif %}
+                                </td>
+                                <td>{{ p.post_type }}</td>
+                                <td>{{ p.caption|default:"-" }}</td>
+                                <td>{{ p.created_at }}</td>
+                                <td>
+                                    <a href="{% url 'edit_post' p.id %}" class="btn btn-warning btn-sm" style="background-color: #ffc107; color: #212529; text-decoration: none; padding: 4px 10px; border-radius: 4px; display: inline-block; margin-right: 5px;">
+                                        Editar
+                                    </a>
+                                    <button type="button" onclick="confirmDeletePost('{{ p.id }}');" class="btn btn-danger btn-sm" style="background-color: #dc3545; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer;">
+                                        Eliminar
+                                    </button>
+                                    <form id="deleteForm_{{ p.id }}" method="POST" action="{% url 'create_post' %}?source={{ selected_source }}" style="display:none;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete_microservice">
+                                        <input type="hidden" name="post_id" value="{{ p.id }}">
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No se encontraron publicaciones devueltas por esta fuente.</p>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-warning">
+                No se pudo realizar la consulta a <strong>{{ active_source_title }}</strong>. Verifique que el servicio esté encendido.
+            </div>
+        {% endif %}
+
+        <hr style="margin-top: 25px; margin-bottom: 20px;">
+        <a href="{% url 'index' %}" class="btn btn-secondary">← Volver al Historial Principal</a>
+    </div>
+
+    <!-- Contenedor oculto para mensajes de Django -->
+    {% if messages %}
+        <div id="djangoMessagesContainer" style="display:none;">
+            {% for message in messages %}
+                <span class="django-message" data-tags="{{ message.tags }}" data-text="{{ message }}"></span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if query_info %}
+        <div id="queryInfoContainer" style="display:none;"
+             data-source="{{ query_info.source }}"
+             data-fuente="{{ query_info.real_fuente }}"
+             data-success="{{ query_info.success|yesno:'true,false' }}">
+        </div>
+    {% endif %}
+
+    <script>
+        function showLoadingModal(titleText, bodyText) {
+            Swal.fire({
+                title: titleText || 'Cargando...',
+                text: bodyText || 'Por favor espere mientras procesamos su solicitud.',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+        function submitFormWithLoading(actionType) {
+            if (actionType === 'create_microservice') {
+                showLoadingModal('Procesando en Microservicios...', 'Guardando publicación vía Orquestador Node.js');
+            } else {
+                showLoadingModal('Guardando en Django...', 'Guardando publicación localmente');
+            }
+        }
+
+        function confirmDeletePost(postId) {
+            Swal.fire({
+                title: '¿Eliminar publicación #' + postId + '?',
+                text: 'Selecciona cómo deseas eliminar esta publicación:',
+                icon: 'warning',
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonColor: '#dc3545',
+                denyButtonColor: '#6c757d',
+                cancelButtonColor: '#adb5bd',
+                confirmButtonText: 'Vía Orquestador Node',
+                denyButtonText: 'Localmente en Django',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                var form = document.getElementById('deleteForm_' + postId);
+                var actionInput = form.querySelector('input[name="action"]');
+                if (result.isConfirmed) {
+                    actionInput.value = 'delete_microservice';
+                    showLoadingModal('Eliminando publicación #' + postId + '...', 'Procesando eliminación a través de la red de microservicios');
+                    form.submit();
+                } else if (result.isDenied) {
+                    actionInput.value = 'delete_django';
+                    showLoadingModal('Eliminando en Django...', 'Eliminando publicación localmente');
+                    form.submit();
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var qEl = document.getElementById("queryInfoContainer");
+            if (qEl) {
+                var src = qEl.getAttribute("data-source");
+                var fuente = qEl.getAttribute("data-fuente") || "";
+
+                var icon = "success";
+                var title = "";
+                var text = "";
+
+                if (src === "java") {
+                    if (fuente.includes("servicio_primario_java") && !fuente.includes("Fallback")) {
+                        title = "Información Cargada desde Java";
+                        text = "Consulta exitosa al microservicio primario Java Spring Boot (Puerto 8080).";
+                        icon = "success";
+                    } else {
+                        title = "Servicio Java Inactivo";
+                        text = "El servicio de Java  no respondió. Se aplicó el Fallback automático y la información fue entregada por: " + (fuente || "Django ORM");
+                        icon = "warning";
+                    }
+                } else if (src === "dotnet") {
+                    if (fuente.includes("servicio_secundario_dotnet") && !fuente.includes("Fallback")) {
+                        title = "Información Cargada desde C# .NET!";
+                        text = "Consulta exitosa al microservicio C# .NET 8 (Puerto 5000).";
+                        icon = "success";
+                    } else {
+                        title = "Servicio C# .NET Inactivo";
+                        text = "El servicio de C#  no respondió. Se aplicó el Fallback automático y la información fue entregada por: " + (fuente || "Django ORM");
+                        icon = "warning";
+                    }
+                } else if (src === "node") {
+                    if (fuente.includes("Fallback directo de Django")) {
+                        title = "Información Cargada vía Fallback de Django";
+                        text = "Los microservicios de la red estaban inactivos. La información fue recuperada directamente desde PostgreSQL vía Django ORM.";
+                        icon = "warning";
+                    } else {
+                        title = "Información Cargada desde Orquestador Node";
+                        text = "Consulta exitosa a la API Gateway - Atendida por: " + fuente;
+                        icon = "success";
+                    }
+                }
+
+                Swal.fire({
+                    icon: icon,
+                    title: title,
+                    text: text,
+                    confirmButtonColor: '#007bff'
+                });
+            }
+
+            var msgElements = document.querySelectorAll("#djangoMessagesContainer .django-message");
+            msgElements.forEach(function(el) {
+                var msgTags = el.getAttribute("data-tags") || "";
+                var msgText = el.getAttribute("data-text") || "";
+                var isSuccess = msgText.includes("✅") || msgTags === "success";
+                var isError = msgText.includes("❌") || msgTags === "error";
+
+                Swal.fire({
+                    icon: isSuccess ? 'success' : (isError ? 'error' : 'warning'),
+                    title: isSuccess ? '¡Éxito!' : (isError ? '¡Atención!' : 'Notificación'),
+                    text: msgText,
+                    confirmButtonColor: '#007bff'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

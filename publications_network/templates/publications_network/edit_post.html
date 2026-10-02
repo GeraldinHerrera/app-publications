@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Post #{{ post.id }}</title>
+    <link rel="stylesheet" href="{% static 'publications_network/css/style.css' %}">
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Editar Post #{{ post.id }}</h2>
+
+        <form method="POST" action="{% url 'edit_post' post.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="post_type">Tipo de Publicación:</label>
+                    <select name="post_type" id="post_type">
+                        {% for code, label in post_types %}
+                            <option value="{{ code }}" {% if post.post_type == code %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="caption">Caption / Texto o Hashtags:</label>
+                    <textarea name="caption" id="caption" rows="4">{{ post.caption }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Archivo Adjunto Actual:</label>
+                    <div style="margin-bottom: 10px;">
+                        {% if post.is_video %}
+                            <video src="{{ post.media_url }}" controls style="max-width: 200px; max-height: 150px; border-radius: 6px; border: 1px solid #ccc;"></video>
+                        {% elif post.is_image %}
+                            <img src="{{ post.media_url }}" alt="Media actual" style="max-width: 200px; max-height: 150px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc;">
+                        {% else %}
+                            <a href="{{ post.media_url }}" target="_blank">Ver archivo actual</a>
+                        {% endif %}
+                    </div>
+
+                    <label for="file">Reemplazar Archivo Adjunto (Opcional):</label>
+                    <input type="file" name="file" id="file">
+                </div>
+            </div>
+
+            <button type="submit" name="action" value="edit_django" onclick="submitFormWithLoading('edit_django');" class="btn btn-secondary">
+                Guardar Localmente en Django
+            </button>
+            <button type="submit" name="action" value="edit_microservice" onclick="submitFormWithLoading('edit_microservice');" class="btn btn-primary" style="margin-left: 10px; background-color: #28a745; border-color: #28a745;">
+                Guardar Vía Orquestador Node.js
+            </button>
+            <a href="{% url 'create_post' %}" class="btn btn-secondary" style="margin-left: 10px;">Cancelar</a>
+        </form>
+    </div>
+
+    <!-- Contenedor oculto para mensajes de Django -->
+    {% if messages %}
+        <div id="djangoMessagesContainer" style="display:none;">
+            {% for message in messages %}
+                <span class="django-message" data-tags="{{ message.tags }}" data-text="{{ message }}"></span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <script>
+        function showLoadingModal(titleText, bodyText) {
+            Swal.fire({
+                title: titleText || 'Cargando...',
+                text: bodyText || 'Por favor espere mientras procesamos su solicitud.',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        }
+        function submitFormWithLoading(actionType) {
+            if (actionType === 'edit_microservice') {
+                showLoadingModal('Procesando Actualización...', 'Actualizando publicación en los microservicios vía Orquestador Node.js');
+            } else {
+                showLoadingModal('Guardando en Django...', 'Actualizando publicación localmente');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var msgElements = document.querySelectorAll("#djangoMessagesContainer .django-message");
+            msgElements.forEach(function(el) {
+                var msgTags = el.getAttribute("data-tags") || "";
+                var msgText = el.getAttribute("data-text") || "";
+                var isSuccess = msgText.includes("✅") || msgTags === "success";
+                var isError = msgText.includes("❌") || msgTags === "error";
+
+                Swal.fire({
+                    icon: isSuccess ? 'success' : (isError ? 'error' : 'warning'),
+                    title: isSuccess ? '¡Éxito!' : (isError ? '¡Atención!' : 'Notificación'),
+                    text: msgText,
+                    confirmButtonColor: '#007bff'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

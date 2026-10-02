@@ -1,3 +1,4 @@
+import os
 from django.db import models
 
 class SocialAccount(models.Model):
@@ -25,8 +26,36 @@ class PostContent(models.Model):
     post_type = models.CharField(max_length=10, choices=POST_TYPES, default='post')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def file_extension(self):
+        if self.file:
+            return os.path.splitext(str(self.file.name))[1].lower()
+        return ''
+
+    @property
+    def is_image(self):
+        ext = self.file_extension
+        image_exts = ['.jpg', '.jpeg', '.jfif', '.pjpeg', '.pjp', '.png', '.gif', '.webp', '.svg', '.bmp', '.ico', '.avif', '.heic', '.tiff']
+        return ext in image_exts or ext == ''
+
+    @property
+    def is_video(self):
+        video_exts = ['.mp4', '.webm', '.ogg', '.mov', '.m4v', '.mkv']
+        return self.file_extension in video_exts
+
+    @property
+    def media_url(self):
+        if not self.file:
+            return ''
+        try:
+            return self.file.url
+        except Exception:
+            return f"/media/{self.file.name}"
+
+
     def __str__(self):
         return f"{self.post_type} - {self.id}"
+
 
 
 class PostTask(models.Model):

@@ -9,11 +9,20 @@
 <body>
     <div class="container">
         <h1>Detalle de la Publicación #{{ post.id }}</h1>
-        
+
         <div class="form-section">
             <p><strong>Tipo de publicación:</strong> {{ post.get_post_type_display }}</p>
             <p><strong>Texto / Caption:</strong> {{ post.caption|default:"Sin texto" }}</p>
-            <p><strong>Archivo adjunto:</strong> {{ post.file.name }}</p>
+            <p><strong>Contenido Multimedia:</strong></p>
+            <div style="margin: 10px 0;">
+                {% if post.is_video %}
+                    <video src="{{ post.media_url }}" controls style="max-width: 350px; max-height: 250px; border-radius: 8px; border: 1px solid #ccc;"></video>
+                {% elif post.is_image %}
+                    <img src="{{ post.media_url }}" alt="Imagen de publicación" style="max-width: 350px; max-height: 250px; object-fit: contain; border-radius: 8px; border: 1px solid #ccc;">
+                {% else %}
+                    <a href="{{ post.media_url }}" target="_blank">📄 Ver archivo adjunto</a>
+                {% endif %}
+            </div>
             <p><strong>Fecha de creación:</strong> {{ post.created_at|date:"Y-m-d H:i" }}</p>
         </div>
 

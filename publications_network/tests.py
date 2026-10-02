@@ -76,3 +76,56 @@ class PublicationsHistoryViewsTest(TestCase):
         self.assertEqual(response_post.status_code, 200)
         self.assertContains(response_post, 'Respuesta simulada de la IA Gemini')
         self.assertTrue(mock_generate_ai.called)
+
+    def test_create_post_view(self):
+        # Test GET
+        response_get = self.client.get(reverse('create_post'))
+        self.assertEqual(response_get.status_code, 200)
+        self.assertContains(response_get, 'Crear Nuevo Post')
+
+        # Test POST
+        post_data = {
+            'post_type': 'reel',
+            'caption': 'Un nuevo reel de prueba'
+        }
+        response_post = self.client.post(reverse('create_post'), post_data, follow=True)
+        self.assertEqual(response_post.status_code, 200)
+        self.assertContains(response_post, 'creado con éxito')
+
+        created_post = PostContent.objects.filter(caption='Un nuevo reel de prueba').first()
+        self.assertIsNotNone(created_post)
+        self.assertEqual(created_post.post_type, 'reel')
+
+    def test_edit_post_view(self):
+        # GET edit page
+        response_get = self.client.get(reverse('edit_post', args=[self.post.id]))
+        self.assertEqual(response_get.status_code, 200)
+        self.assertContains(response_get, f'Editar Post #{self.post.id}')
+
+        # POST update
+        edit_data = {
+            'post_type': 'story',
+            'caption': 'Caption editado exitosamente'
+        }
+        response_post = self.client.post(reverse('edit_post', args=[self.post.id]), edit_data, follow=True)
+        self.assertEqual(response_post.status_code, 200)
+        self.assertContains(response_post, 'actualizado con éxito')
+
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.caption, 'Caption editado exitosamente')
+        self.assertEqual(self.post.post_type, 'story')
+
+    def test_delete_post_view(self):
+        # GET confirm delete page
+        response_get = self.client.get(reverse('delete_post', args=[self.post.id]))
+        self.assertEqual(response_get.status_code, 200)
+        self.assertContains(response_get, 'Confirmar Eliminación')
+
+        # POST delete
+        post_id = self.post.id
+        response_post = self.client.post(reverse('delete_post', args=[post_id]), follow=True)
+        self.assertEqual(response_post.status_code, 200)
+        self.assertContains(response_post, 'eliminado correctamente')
+        self.assertFalse(PostContent.objects.filter(id=post_id).exists())
+
+
