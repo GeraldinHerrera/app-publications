@@ -81,7 +81,7 @@ class PublicationsHistoryViewsTest(TestCase):
         # Test GET
         response_get = self.client.get(reverse('create_post'))
         self.assertEqual(response_get.status_code, 200)
-        self.assertContains(response_get, 'Crear Nuevo Post')
+        self.assertContains(response_get, 'Crear y Gestionar Posts')
 
         # Test POST
         post_data = {
@@ -90,7 +90,7 @@ class PublicationsHistoryViewsTest(TestCase):
         }
         response_post = self.client.post(reverse('create_post'), post_data, follow=True)
         self.assertEqual(response_post.status_code, 200)
-        self.assertContains(response_post, 'creado con éxito')
+        self.assertContains(response_post, 'creado localmente en Django con éxito')
 
         created_post = PostContent.objects.filter(caption='Un nuevo reel de prueba').first()
         self.assertIsNotNone(created_post)
@@ -109,7 +109,7 @@ class PublicationsHistoryViewsTest(TestCase):
         }
         response_post = self.client.post(reverse('edit_post', args=[self.post.id]), edit_data, follow=True)
         self.assertEqual(response_post.status_code, 200)
-        self.assertContains(response_post, 'actualizado con éxito')
+        self.assertContains(response_post, 'actualizado localmente en Django con éxito')
 
         self.post.refresh_from_db()
         self.assertEqual(self.post.caption, 'Caption editado exitosamente')
@@ -125,7 +125,7 @@ class PublicationsHistoryViewsTest(TestCase):
         post_id = self.post.id
         response_post = self.client.post(reverse('delete_post', args=[post_id]), follow=True)
         self.assertEqual(response_post.status_code, 200)
-        self.assertContains(response_post, 'eliminado correctamente')
+        self.assertContains(response_post, 'eliminado localmente en Django con éxito')
         self.assertFalse(PostContent.objects.filter(id=post_id).exists())
 
 

@@ -78,9 +78,9 @@
 
             <div style="margin-top: 12px;">
                 <strong>Documentación Swagger:</strong><br>
-                <a href="http://localhost:3000/api-docs" target="_blank" class="swagger-btn">Swagger Node.js</a>
-                <a href="http://localhost:8080/swagger-ui.html" target="_blank" class="swagger-btn">Swagger Java Spring Boot</a>
-                <a href="http://localhost:5000/swagger" target="_blank" class="swagger-btn">Swagger C#</a>
+                <a href="https://api-nodejspublications-production.up.railway.app/api-docs/" target="_blank" class="swagger-btn">Swagger Node.js</a>
+                <a href="https://api-javapublications-production.up.railway.app/swagger-ui/index.html" target="_blank" class="swagger-btn">Swagger Java Spring Boot</a>
+                <a href="https://api-netpublications-production.up.railway.app/swagger/index.html" target="_blank" class="swagger-btn">Swagger C#</a>
             </div>
 
             <div class="query-btn-group">
@@ -137,50 +137,54 @@
 
         {% if ms_success %}
             {% if microservices_posts %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Vista Previa / Contenido</th>
-                            <th>Tipo</th>
-                            <th>Caption / Texto</th>
-                            <th>Fecha de Registro</th>
-                            <th>Acciones Vía Orquestador</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in microservices_posts %}
+                <div class="table-responsive">
+                    <table>
+                        <thead>
                             <tr>
-                                <td><strong>#{{ p.id }}</strong></td>
-                                <td>
-                                    {% if p.is_video %}
-                                        <video src="{{ p.media_url }}" controls style="max-width: 130px; max-height: 95px; border-radius: 6px; border: 1px solid #ccc;"></video>
-                                    {% elif p.is_image %}
-                                        <img src="{{ p.media_url }}" alt="Media Post" onerror="this.onerror=null; this.src='/media/publications_media/sample.png';" style="max-width: 130px; max-height: 95px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc;">
-                                    {% else %}
-                                        <a href="{{ p.media_url }}" target="_blank">📄 Archivo</a>
-                                    {% endif %}
-                                </td>
-                                <td>{{ p.post_type }}</td>
-                                <td>{{ p.caption|default:"-" }}</td>
-                                <td>{{ p.created_at }}</td>
-                                <td>
-                                    <a href="{% url 'edit_post' p.id %}" class="btn btn-warning btn-sm" style="background-color: #ffc107; color: #212529; text-decoration: none; padding: 4px 10px; border-radius: 4px; display: inline-block; margin-right: 5px;">
-                                        Editar
-                                    </a>
-                                    <button type="button" onclick="confirmDeletePost('{{ p.id }}');" class="btn btn-danger btn-sm" style="background-color: #dc3545; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer;">
-                                        Eliminar
-                                    </button>
-                                    <form id="deleteForm_{{ p.id }}" method="POST" action="{% url 'create_post' %}?source={{ selected_source }}" style="display:none;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="delete_microservice">
-                                        <input type="hidden" name="post_id" value="{{ p.id }}">
-                                    </form>
-                                </td>
+                                <th>ID</th>
+                                <th>Vista Previa / Contenido</th>
+                                <th>Tipo</th>
+                                <th>Caption / Texto</th>
+                                <th>Fecha de Registro</th>
+                                <th>Acciones Vía Orquestador</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for p in microservices_posts %}
+                                <tr>
+                                    <td><strong>#{{ p.id }}</strong></td>
+                                    <td>
+                                        {% if p.is_video %}
+                                            <video src="{{ p.media_url }}" controls style="max-width: 100px; max-height: 75px; border-radius: 6px; border: 1px solid #ccc;"></video>
+                                        {% elif p.is_image %}
+                                            <img src="{{ p.media_url }}" alt="Media Post" onerror="this.onerror=null; this.src='/media/publications_media/sample.png';" style="max-width: 100px; max-height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc;">
+                                        {% else %}
+                                            <a href="{{ p.media_url }}" target="_blank">📄 Archivo</a>
+                                        {% endif %}
+                                    </td>
+                                    <td><span style="background:#e9ecef; padding:4px 8px; border-radius:4px; font-size:0.85em; font-weight:600;">{{ p.post_type }}</span></td>
+                                    <td style="max-width: 250px;">{{ p.caption|default:"-" }}</td>
+                                    <td style="white-space: nowrap;">{{ p.created_at }}</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="{% url 'edit_post' p.id %}" class="btn btn-warning btn-sm" style="background-color: #ffc107; color: #212529; text-decoration: none; padding: 4px 10px; border-radius: 4px;">
+                                                Editar
+                                            </a>
+                                            <button type="button" onclick="confirmDeletePost('{{ p.id }}');" class="btn btn-danger btn-sm" style="background-color: #dc3545; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer;">
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                        <form id="deleteForm_{{ p.id }}" method="POST" action="{% url 'create_post' %}?source={{ selected_source }}" style="display:none;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="delete_microservice">
+                                            <input type="hidden" name="post_id" value="{{ p.id }}">
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
                 <p>No se encontraron publicaciones devueltas por esta fuente.</p>
             {% endif %}

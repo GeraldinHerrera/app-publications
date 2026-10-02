@@ -28,7 +28,7 @@ def send_alert_notification(post_task_id: int, event_type: str, channel_type: st
 
 #Microservicio Orquestador Node.js
 
-NODE_ORCHESTRATOR_URL = os.getenv("NODE_ORCHESTRATOR_URL", "http://localhost:3000/api/posts")
+NODE_ORCHESTRATOR_URL = os.getenv("NODE_ORCHESTRATOR_URL", "https://api-nodejspublications-production.up.railway.app/api/posts")
 
 def fetch_posts_from_orchestrator():
     try:
@@ -66,8 +66,8 @@ def delete_post_in_orchestrator(post_id: int):
     except Exception as e:
         return False, {"error": "Conexión fallida", "message": str(e)}
 
-JAVA_SERVICE_URL = os.getenv("JAVA_SERVICE_URL", "http://localhost:8080/api/posts")
-DOTNET_SERVICE_URL = os.getenv("DOTNET_SERVICE_URL", "http://localhost:5000/api/posts")
+JAVA_SERVICE_URL = os.getenv("JAVA_SERVICE_URL", "https://api-javapublications-production.up.railway.app/api/posts")
+DOTNET_SERVICE_URL = os.getenv("DOTNET_SERVICE_URL", "https://api-netpublications-production.up.railway.app/api/posts")
 
 def fetch_posts_from_java():
     try:

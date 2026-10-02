@@ -46,51 +46,55 @@
         </p>
 
         {% if history %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID Tarea</th>
-                        <th>Vista Previa</th>
-                        <th>Tipo</th>
-                        <th>Red Social</th>
-                        <th>Usuario</th>
-                        <th>Caption / Texto</th>
-                        <th>Fecha Programada</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for task in history %}
+            <div class="table-responsive">
+                <table>
+                    <thead>
                         <tr>
-                            <td>{{ task.id }}</td>
-                            <td>
-                                {% if task.post_content.is_video %}
-                                    <video src="{{ task.post_content.media_url }}" controls style="max-width: 110px; max-height: 80px; border-radius: 6px; border: 1px solid #ccc;"></video>
-                                {% elif task.post_content.is_image %}
-                                    <img src="{{ task.post_content.media_url }}" alt="Media Post" onerror="this.onerror=null; this.src='/media/publications_media/sample.png';" style="max-width: 110px; max-height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc;">
-                                {% else %}
-                                    <a href="{{ task.post_content.media_url }}" target="_blank">📄 Archivo</a>
-                                {% endif %}
-                            </td>
-                            <td>{{ task.post_content.get_post_type_display }}</td>
-                            <td>{{ task.account.get_platform_display }}</td>
-                            <td>@{{ task.account.account_user }}</td>
-                            <td>{{ task.post_content.caption|default:"-"|truncatewords:10 }}</td>
-                            <td>{{ task.scheduled_at|date:"Y-m-d H:i" }}</td>
-                            <td><strong>{{ task.get_status_display }}</strong></td>
-                            <td>
-                                <a href="{% url 'edit_post' task.post_content.id %}" class="btn btn-warning btn-sm" style="background-color: #ffc107; color: #212529; text-decoration: none; padding: 4px 10px; border-radius: 4px; display: inline-block; margin-right: 5px;">
-                                    Editar
-                                </a>
-                                <a href="{% url 'post_detail' task.post_content.id %}" class="btn btn-secondary btn-sm">
-                                    Ver detalle
-                                </a>
-                            </td>
+                            <th>ID Tarea</th>
+                            <th>Vista Previa</th>
+                            <th>Tipo</th>
+                            <th>Red Social</th>
+                            <th>Usuario</th>
+                            <th>Caption / Texto</th>
+                            <th>Fecha Programada</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for task in history %}
+                            <tr>
+                                <td><strong>#{{ task.id }}</strong></td>
+                                <td>
+                                    {% if task.post_content.is_video %}
+                                        <video src="{{ task.post_content.media_url }}" controls style="max-width: 100px; max-height: 75px; border-radius: 6px; border: 1px solid #ccc;"></video>
+                                    {% elif task.post_content.is_image %}
+                                        <img src="{{ task.post_content.media_url }}" alt="Media Post" onerror="this.onerror=null; this.src='/media/publications_media/sample.png';" style="max-width: 100px; max-height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc;">
+                                    {% else %}
+                                        <a href="{{ task.post_content.media_url }}" target="_blank">📄 Archivo</a>
+                                    {% endif %}
+                                </td>
+                                <td><span style="background:#e9ecef; padding:4px 8px; border-radius:4px; font-size:0.85em; font-weight:600;">{{ task.post_content.get_post_type_display }}</span></td>
+                                <td>{{ task.account.get_platform_display }}</td>
+                                <td>@{{ task.account.account_user }}</td>
+                                <td style="max-width: 220px;">{{ task.post_content.caption|default:"-"|truncatewords:8 }}</td>
+                                <td style="white-space: nowrap;">{{ task.scheduled_at|date:"Y-m-d H:i" }}</td>
+                                <td><strong>{{ task.get_status_display }}</strong></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{% url 'edit_post' task.post_content.id %}" class="btn btn-warning btn-sm" style="background-color: #ffc107; color: #212529; text-decoration: none; padding: 4px 10px; border-radius: 4px;">
+                                            Editar
+                                        </a>
+                                        <a href="{% url 'post_detail' task.post_content.id %}" class="btn btn-secondary btn-sm" style="padding: 4px 10px;">
+                                            Ver detalle
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         {% else %}
             <p>No hay historial de publicaciones registrado aún.</p>
         {% endif %}
