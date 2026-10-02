@@ -158,12 +158,12 @@ def fetch_posts_with_resilience(preferred_source='node'):
         # 2. Fallback directo a Java
         success_jv, res_jv = fetch_posts_from_java()
         if success_jv:
-            res_jv['fuente'] = "servicio_primario_java (Fallback por caída de Node)"
+            res_jv['fuente'] = "servicio_primario_java"
             return True, res_jv
         # 3. Fallback directo a .NET
         success_dn, res_dn = fetch_posts_from_dotnet()
         if success_dn:
-            res_dn['fuente'] = "servicio_secundario_dotnet (Fallback por caída de Node)"
+            res_dn['fuente'] = "servicio_secundario_dotnet"
             return True, res_dn
         # 4. Fallback directo a Django ORM
         return fetch_posts_django_fallback("Microservicios inactivos")
